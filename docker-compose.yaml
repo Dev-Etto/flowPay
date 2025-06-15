@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+
+  flowpay-db:
+    image: postgres:15-alpine
+    container_name: flowpay-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: flowpay-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  flowpay-rabbit:
+    image: rabbitmq:3.13-management
+    container_name: flowpay-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
+volumes:
+  postgres_data:
