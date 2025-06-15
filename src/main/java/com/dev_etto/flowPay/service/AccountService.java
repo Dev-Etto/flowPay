@@ -14,11 +14,11 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public AccountResponseDTO createAccount(AccountRequestDTO request) {
-        Account newAccount = new Account(null, request.ownerName(), request.initialBalance(), request.document());
-        
-        Account savedAccount = accountRepository.save(newAccount);
-        
-        return new AccountResponseDTO(savedAccount.getId(), savedAccount.getOwnerName(), savedAccount.getDocument(), savedAccount.getBalance());
-    }
+public AccountResponseDTO createAccount(AccountRequestDTO request) {
+    Account newAccount = new Account(null, request.ownerName(), request.initialBalance(), request.document());
+
+    Account savedAccount = accountRepository.save(newAccount);
+
+    return new AccountResponseDTO(savedAccount.getId(), savedAccount.getOwnerName(), savedAccount.getDocument(), savedAccount.getBalance());
+}
 }
