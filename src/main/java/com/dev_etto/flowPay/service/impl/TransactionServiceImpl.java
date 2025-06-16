@@ -3,6 +3,7 @@ package com.dev_etto.flowPay.service.impl;
 import com.dev_etto.flowPay.config.RabbitMQConfig;
 import com.dev_etto.flowPay.controller.dto.TransactionRequestDTO;
 import com.dev_etto.flowPay.controller.dto.TransactionResponseDTO;
+import com.dev_etto.flowPay.controller.dto.TransactionStatusResponseDTO;
 import com.dev_etto.flowPay.exception.AccountNotFoundException;
 import com.dev_etto.flowPay.exception.InsufficientBalanceException;
 import com.dev_etto.flowPay.model.Transaction;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -60,5 +62,17 @@ public class TransactionServiceImpl implements TransactionService {
                 savedTransaction.getCreatedAt(),
                 "Transação recebida e está em processamento."
         );
+    }
+    
+    @Override
+    public TransactionStatusResponseDTO findTransactionById(UUID id) {
+        var transactionOptional = transactionRepository.findById(id);
+    
+        return transactionOptional.map(trx -> new TransactionStatusResponseDTO(
+                    trx.getId(),
+                    trx.getStatus().toString(),
+                    trx.getCreatedAt(),
+                    trx.getProcessedAt()))
+            .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
     }
 }

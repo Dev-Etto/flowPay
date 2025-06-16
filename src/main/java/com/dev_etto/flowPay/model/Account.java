@@ -16,14 +16,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Account {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false)
     private String ownerName;
     
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Column(nullable = false)
     private BigDecimal balance;
 
