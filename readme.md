@@ -97,13 +97,13 @@ O projeto segue uma arquitetura em camadas:
 
 ```
            [Requisição: POST /api/v1/transactions]
-[CLIENTE] ------------------------------------------------> [1. Controller]
-    ^                                                              |
-    |                                                              | [chama o serviço]
-    | [7. Resposta Imediata: 202 Accepted]                          v
-    |                                                          [2. Service] ---+------> [3. Banco de Dados (Postgres)]
-    |                                                          |   - Valida    |           (Salva Tx com status PENDING)
-    +----------------------------------------------------------+   - Responde  |
+[CLIENTE] ---------------------------------- --> [1. Controller]
+    ^                                                    |
+    |                                                    | [chama o serviço]
+    | [7. Resposta Imediata: 202 Accepted]               v
+    |                                              [2. Service] -+------> [3. Banco de Dados (Postgres)]
+    |                                          |   - Valida    |          (Salva Tx com status PENDING)
+    +------------------------------------------+   - Responde  |
                                                                |               |
                                                                +-------------> [4. RabbitMQ]
                                                                  (Envia ID)      (Fila: "transactions.queue")
