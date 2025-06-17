@@ -96,28 +96,33 @@ O projeto segue uma arquitetura em camadas:
 ### Representação Visual do Fluxo
 
 ```
-           [Requisição: POST /api/v1/transactions]
-[CLIENTE] ------------------------------------------------> [1. Controller]
-    ^                                                              |
-    |                                                              | [chama o serviço]
-    | [7. Resposta Imediata: 202 Accepted]                          v
-    |                                                          [2. Service] ---+------> [3. Banco de Dados (Postgres)]
-    |                                                          |   - Valida    |           (Salva Tx com status PENDING)
-    +----------------------------------------------------------+   - Responde  |
-                                                               |               |
-                                                               +-------------> [4. RabbitMQ]
-                                                                 (Envia ID)      (Fila: "transactions.queue")
-                                                                                             |
-                                                                                             | [5. Mensagem é entregue]
-                                                                                             |
-                                                                                             v
-                                                                                       [6. Consumer]
-                                                                                       |   - Ouve a fila
-                                                                                       |   - Debita/Credita
-                                                                                       |   - Atualiza status para COMPLETED
-                                                                                       v
-                                                                                [7. Banco de Dados (Postgres)]
-                                                                                    (Salva os novos saldos e o status da Tx)
+[CLIENTE] -> [1. Controller]
+    ^           |
+    |           | [chama o serviço]
+    |           v
+    |     [2. Service]
+    |       - Valida
+    |       - Responde
+    |        /     \
+    |       /       \
+    |      v         v
+    | [3. DB]     [4. RabbitMQ]
+    |  (PENDING)    (Envia ID)
+    |               (Fila: "transactions.queue")
+    |                  |
+    |                  | [5. Mensagem é entregue]
+    |                  v
+    |             [6. Consumer]
+    |              - Ouve a fila
+    |              - Debita/Credita
+    |              - Atualiza status
+    |                  |
+    |                  v
+    |          [7. Banco de Dados]
+    |           (Salva saldos e
+    |            status: COMPLETED)
+    |
+    +-- [7. Resposta: 202 Accepted]
 ```
 
 ## Configurações
