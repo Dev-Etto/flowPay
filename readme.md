@@ -93,6 +93,33 @@ O projeto segue uma arquitetura em camadas:
 3. Consumidor processa a transação e atualiza seu status
 4. Cliente pode consultar o status da transação a qualquer momento
 
+### Representação Visual do Fluxo
+
+```
+           [Requisição: POST /api/v1/transactions]
+[CLIENTE] ------------------------------------------------> [1. Controller]
+    ^                                                              |
+    |                                                              | [chama o serviço]
+    | [7. Resposta Imediata: 202 Accepted]                          v
+    |                                                          [2. Service] ---+------> [3. Banco de Dados (Postgres)]
+    |                                                          |   - Valida    |           (Salva Tx com status PENDING)
+    +----------------------------------------------------------+   - Responde  |
+                                                               |               |
+                                                               +-------------> [4. RabbitMQ]
+                                                                 (Envia ID)      (Fila: "transactions.queue")
+                                                                                             |
+                                                                                             | [5. Mensagem é entregue]
+                                                                                             |
+                                                                                             v
+                                                                                       [6. Consumer]
+                                                                                       |   - Ouve a fila
+                                                                                       |   - Debita/Credita
+                                                                                       |   - Atualiza status para COMPLETED
+                                                                                       v
+                                                                                [7. Banco de Dados (Postgres)]
+                                                                                    (Salva os novos saldos e o status da Tx)
+```
+
 ## Configurações
 
 ### Banco de Dados (PostgreSQL)
